@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="true"
+        jar="C:\Users\wesma\AndroidStudioProjects\SEGLAB1\app\build\intermediates\incremental-runtime-classes\debug\instant-run.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="26.0.1"
+        sha1="3be78ebc2706b2e1fe2f12d5726887a92d6c183b">
+        <dex dex="C:\Users\wesma\AndroidStudioProjects\SEGLAB1\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run_5cba50d3757ee9d80c458f0cd80d77b1d77772c3\classes.dex" />
+    </item>
+    <item
+        is-multidex="true"
+        jar="C:\Users\wesma\AndroidStudioProjects\SEGLAB1\app\build\intermediates\incremental-classes\debug\instant-run-bootstrap.jar"
+        jumboMode="true"
+        optimize="true"
+        revision="26.0.1"
+        sha1="c4140b6a03e6a2a6011cda97e4f4f804d7828194">
+        <dex dex="C:\Users\wesma\AndroidStudioProjects\SEGLAB1\app\build\intermediates\transforms\dex\debug\folders\1000\10000\instant-run-bootstrap_9971008925436dbce6d1db9bd0108fd7254c76f0\classes.dex" />
+    </item>
+
+</items>
