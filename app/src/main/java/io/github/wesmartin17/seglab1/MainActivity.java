@@ -1,48 +1,53 @@
 package io.github.wesmartin17.seglab1;
 
-import android.content.res.ColorStateList;
 import android.graphics.PorterDuff;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.text.Selection;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Field;
+import layout.FragmentEnterNames;
+import layout.FragmentEnterRoomDetails;
 
 public class MainActivity extends AppCompatActivity {
+
+    FragmentManager mFragmentManager;
+    Fragment mFragment;
+    FragmentTransaction mFragmentTransition;
+
+    public static MainActivity mMainActivity;
 
     LinearLayout layoutStep1,layoutStep2;
 
     Button newButton,removeButton,nextButton,prevButton;
     LinearLayout layout;
 
-    private int counter = 1;
     private int step = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mFragmentManager = getSupportFragmentManager();
+
         setContentView(R.layout.activity_main);
 
-        layoutStep1 = (LinearLayout)findViewById(R.id.layoutStepOne);
-        layoutStep2 = (LinearLayout)findViewById(R.id.layoutStep2);
+        final FragmentEnterNames fragmentEnterNames = new FragmentEnterNames();
 
-        layoutStep1.setVisibility(View.VISIBLE);
-        layoutStep2.setVisibility(View.GONE);
-
+        mFragmentManager = getSupportFragmentManager();
+        mFragment = mFragmentManager.findFragmentById(R.id.frame);
+        if(mFragment == null) {
+            replaceFragment(fragmentEnterNames, true);
+        }
 
         newButton = (Button)findViewById(R.id.btnAdd);
         removeButton = (Button)findViewById(R.id.btnRemove);
@@ -82,68 +87,34 @@ public class MainActivity extends AppCompatActivity {
         newButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            if(counter < 12) {
-                counter++;
-                removeButton.setEnabled(true);
-
-                EditText editText = (EditText)getLayoutInflater().inflate(R.layout.edittext,null);
-                /*EditText editText = new EditText(getBaseContext());
-                editText.getBackground().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
-                editText.setSingleLine();
-                editText.setHighlightColor(getResources().getColor(R.color.colorPrimary));
-                */
-                editText.setHint("Roommate " + counter);
-                editText.requestFocus();
-
-
-                layout.addView(editText);
-            }
-            if(counter == 12){
-                newButton.setEnabled(false);
-            }
+                int num = fragmentEnterNames.addName();
+                if(num < 12){
+                    enableButton(removeButton);
+                }
+                else if(num == 12){
+                    disableButton(newButton);
+                }
             }
         });
 
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(counter > 1) {
-                    Log.v("WM", layout.getChildCount() + "");
-                    counter--;
-                    try {
-                        layout.removeView(layout.getChildAt(counter));
-                    } catch (NullPointerException e) {
-                        Log.v("WM", "NAH FAM DIDN'T WORK");
-                    }
-                    (layout.getChildAt(counter-1)).requestFocus();
-                }
-                if(counter == 1)
-                    removeButton.setEnabled(false);
-                if(counter <=12)
-                    newButton.setEnabled(true);
+
+                int num = fragmentEnterNames.removeName();
+
+                if(num == 1)
+                    disableButton(removeButton);
+                if(num <=12)
+                    enableButton(newButton);
             }
         });
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int locNotEntered = -1;
-                boolean canMoveOn = true;
-                for(int i = 0; i <counter; i++){
-                    if(((EditText)layout.getChildAt(i)).getText().toString().length() == 0){
-                        Log.v("WM","TEXT: "+(((EditText) layout.getChildAt(i)).getText().toString()));
-                        canMoveOn = false;
-                        locNotEntered = i;
-                    }
-                }
-
-                if(canMoveOn) {
-                    initializeStep2(layout.getChildCount() - 1);
-                }
-                else {
-                    Toast.makeText(getBaseContext(), "You must enter a name!", Toast.LENGTH_LONG).show();
-                    layout.getChildAt(locNotEntered).requestFocus();
-
+                if(fragmentEnterNames.validate()) {
+                    initializeStep2(fragmentEnterNames.getNames());
                 }
 
             }
@@ -154,15 +125,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void initializeStep2(int roommates){
-
-        layoutStep1.setVisibility(View.GONE);
+    private void initializeStep2(String[] roommates){
         newButton.setVisibility(View.GONE);
         removeButton.setVisibility(View.GONE);
         prevButton.setVisibility(View.VISIBLE);
-        layoutStep2.setVisibility(View.VISIBLE);
+
+        FragmentEnterRoomDetails fragmentEnterRoomDetails = new FragmentEnterRoomDetails();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("name",roommates[0]);
+        replaceFragment(fragmentEnterRoomDetails,true);
+        fragmentEnterRoomDetails.setArguments(bundle);
 
 
     }
+
+
+    /**
+     * Replaces a given fragment in the fragment frame. should probably go somewhere else eventually where it can be more widely used
+     *
+     * @param fragment desired fragment within the scope of this class (it must implement its OnFragmentIneractionListener)
+     * @param backStack it will add it to the backstack if true
+     */
+    public void replaceFragment(Fragment fragment, boolean backStack) {
+        mFragmentTransition = mFragmentManager.beginTransaction();
+        mFragmentTransition.setCustomAnimations(R.anim.fade_in,R.anim.fade_out);
+        if(backStack)
+            mFragmentTransition.replace(R.id.frame,fragment).addToBackStack("").commit();
+        else
+            mFragmentTransition.replace(R.id.frame,fragment).commit();
+    }
+
+    private void disableButton(Button b){
+        b.setEnabled(false);
+        b.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+    }
+
+    private void enableButton(Button b){
+        b.setEnabled(true);
+        b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+    }
+
 
 }
