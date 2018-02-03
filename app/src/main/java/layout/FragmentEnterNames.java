@@ -2,7 +2,9 @@ package layout;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import io.github.wesmartin17.seglab1.R;
 
@@ -22,24 +26,37 @@ public class FragmentEnterNames extends Fragment {
 
     LinearLayout layout;
 
+    ArrayList<EditText> editTexts;
+
+    EditText firstEditText;
+
     public FragmentEnterNames() {
         // Required empty public constructor
+        editTexts = new ArrayList<>();
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_enter_names, container, false);
         layout = (LinearLayout)view.findViewById(R.id.nameLayout);
-
+        firstEditText = (EditText)view.findViewById(R.id.editText);
         return view;
     }
-
+    /*
+    public void restore(){
+        counter = 1;
+        for(int i = 0; i < editTexts.size(); i++){
+            ((ViewGroup)editTexts.get(i).getParent()).removeView(editTexts.get(i));
+            editTexts.get(i).setVisibility(View.VISIBLE);
+            layout.addView(editTexts.get(i));
+            counter++;
+        }
+    }
+    */
 
     public int addName(){
         counter++;
-        //removeButton.setEnabled(true);
 
         EditText editText = (EditText)getActivity().getLayoutInflater().inflate(R.layout.edittext,null);
             /*EditText editText = new EditText(getBaseContext());
@@ -47,7 +64,9 @@ public class FragmentEnterNames extends Fragment {
             editText.setSingleLine();
             editText.setHighlightColor(getResources().getColor(R.color.colorPrimary));
             */
+
         editText.setHint("Roommate " + counter);
+
         editText.requestFocus();
 
 
@@ -64,10 +83,10 @@ public class FragmentEnterNames extends Fragment {
             counter--;
             try {
                 layout.removeView(layout.getChildAt(counter));
+                (layout.getChildAt(counter-1)).requestFocus();
             } catch (NullPointerException e) {
                 Log.v("WM", "NAH FAM DIDN'T WORK");
             }
-            (layout.getChildAt(counter-1)).requestFocus();
         }
 
         return counter;
@@ -90,6 +109,9 @@ public class FragmentEnterNames extends Fragment {
             Toast.makeText(getActivity(), "You must enter a name!", Toast.LENGTH_LONG).show();
             layout.getChildAt(locNotEntered).requestFocus();
         }
+        else{
+            //layout.removeAllViewsInLayout();
+        }
 
         return canMoveOn;
     }
@@ -104,4 +126,11 @@ public class FragmentEnterNames extends Fragment {
         return  roommates;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArray("names",getNames());
+    }
 }
+

@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar"
+        android:background="@android:color/white"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -20,7 +21,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="12dp"
             android:text="Enter personnames info here: "
-            android:textAlignment="center"
+            android:textAlignment="viewStart"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="24sp" />
 
@@ -40,7 +41,7 @@
                 android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/editText4"
+                android:id="@+id/roomSizeEditText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="8"
@@ -78,9 +79,25 @@
                 android:id="@+id/spinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:textAlignment="viewEnd" />
 
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/roommatesinroom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="Roommates in room:"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+
+        <LinearLayout
+            android:id="@+id/roommates"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"></LinearLayout>
 
     </LinearLayout>
 </FrameLayout>
